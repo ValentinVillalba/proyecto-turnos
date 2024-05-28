@@ -20,14 +20,4 @@ def get_data():
         return jsonify(rows)
     else:
         return jsonify([])
-
-#Ruta para crear una tabla, no se usa desde el front-end
-@app.route('/create_table')
-def create_table_route():
-    connection = create_connection()
-    if connection:
-        create_table(connection)
-        close_connection(connection)
-        return "TABLA CREADA"
-    else:
-        return "ERROR AL CONECTAR A MYSQL"
+    

@@ -28,16 +28,3 @@ def close_connection(connection):
         connection.close()
         print("DESCONECTADO DE MYSQL")
 
-def create_table(connection):
-    try:
-        cursor = connection.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS turnos (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                nombre VARCHAR(100) NOT NULL
-            );
-        """)
-        connection.commit()
-        print("TABLA CREADA")
-    except Error as e:
-        print(f"ERROR AL CREAR LA TABLA: {e}")
