@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
+from app import db
 import json
 
 with open('password.json') as pass_file:
@@ -26,5 +27,11 @@ def create_connection():
 def close_connection(connection):
     if connection.is_connected():
         connection.close()
-        print("DESCONECTADO DE MYSQL")
+        print("MYSQL DESCONECTADO CORRECTAMENTE")
 
+#TABLAS
+class Turnos(db.Model):
+    __tablename__ = 'turnos'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre = db.Column(db.String(255), nullable=False)
+    edad = db.Column(db.Integer, nullable=False)
