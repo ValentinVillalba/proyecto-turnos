@@ -17,7 +17,7 @@ def get_data():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM turnos")
+        cursor.execute("SELECT * FROM tabla_turnos")
         rows = cursor.fetchall()
         close_connection(connection)
         return jsonify(rows)

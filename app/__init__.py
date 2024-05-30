@@ -11,6 +11,7 @@ with open('password.json') as pass_file:
 secret_pass = pass_data['password']
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:'+ secret_pass +'@localhost/bdd_turnos'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)

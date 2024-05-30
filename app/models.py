@@ -30,8 +30,7 @@ def close_connection(connection):
         print("MYSQL DESCONECTADO CORRECTAMENTE")
 
 #TABLAS
-class Turnos(db.Model):
-    __tablename__ = 'turnos'
+class TablaTurnos(db.Model):
+    __tablename__ = 'tabla_turnos'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre = db.Column(db.String(255), nullable=False)
-    edad = db.Column(db.Integer, nullable=False)

@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.innerHTML = `
                     <td>${turno.id}</td>
                     <td>${turno.nombre}</td>
-                    <td>${turno.edad}</td>
                 `;
                 tbody.appendChild(row);
             });
