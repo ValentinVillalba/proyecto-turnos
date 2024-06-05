@@ -30,7 +30,30 @@ def close_connection(connection):
         print("MYSQL DESCONECTADO CORRECTAMENTE")
 
 #TABLAS
-class TablaTurnos(db.Model):
-    __tablename__ = 'tabla_turnos'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre = db.Column(db.String(255), nullable=False)
+class Pacientes(db.Model):
+    __tablename__ = 'pacientes'
+    id_paciente = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    dni = db.Column(db.Integer, nullable=False)
+    fecha_nac = db.Column(db.Date, nullable=False)
+    obra_soc = db.Column(db.String(30), nullable=False)
+    telefono = db.Column(db.String(30), nullable=False)
+    email = db.Column(db.String(30), nullable=False)
+    direccion = db.Column(db.String(30), nullable=False)
+    estado = db.Column(db.Boolean, nullable=False)
+
+class Turnos(db.Model):
+    __tablename__ = 'turnos'
+    id_turno = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    fecha = db.Column(db.Date, nullable=False)
+    hora = db.Column(db.Time, nullable=False)
+    estado = db.Column(db.Boolean, nullable=False)
+    id_paciente = db.Column(db.Integer, db.ForeignKey('pacientes.id_paciente'), nullable=False)
+
+class Usuarios(db.Model):
+    __tablename__ = 'usuarios'
+    id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_usuario = db.Column(db.String(30), nullable=False)
+    contraseña = db.Column(db.String(8), nullable=False)
+    rol = db.Column(db.Enum('secretaria', 'cliente'), nullable=False)
+    id_paciente = db.Column(db.Integer, db.ForeignKey('pacientes.id_paciente'), nullable=False)

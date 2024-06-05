@@ -1,8 +1,17 @@
+from datetime import date, time, timedelta
 from flask import jsonify, render_template
 from app.models import create_connection, close_connection
 from app import app
 
 #TODO: Revisar el tema del Blueprint
+
+#Serializar los datos de la base de datos
+def serialize_data(rows):
+    for row in rows:
+        for key, value in row.items():
+            if isinstance(value, (timedelta, date, time)):
+                row[key] = str(value)
+    return rows
 
 #RUTAS
 
@@ -17,9 +26,10 @@ def get_data():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM tabla_turnos")
+        cursor.execute("SELECT * FROM turnos")
         rows = cursor.fetchall()
         close_connection(connection)
+        rows = serialize_data(rows)
         return jsonify(rows)
     else:
         return jsonify([])
