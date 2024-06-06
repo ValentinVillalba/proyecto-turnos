@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Defino el método de codificación del documento html, para que admita caracteres especiales -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Lo utilizo para controlar la vista en diferentes dispositivos Escala inicial 1.0, es para que se inicie sin zoom -->
+    <title>Login - Consultorio Dr. Amado</title> <!-- Pongo el título a la página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body class="login-page">
+    <!-- Cuando uso class, le digo que use las diferentes clases que tengo definidas en el archivo styles.css, para que les otorgue el formato correspondiente-->
+    <div class="login-container">
+        <h1>Login al Consultorio Dr. Amado</h1>
+        <form action="index.html" method="POST">
+            <!-- Defino el formulario con el método Post, porque es necesario para transmitir datos sensibles, como lo es el usuario y la contraseña -->
+            <label class="label-login" for="nombreusuario">Usuario:</label> <!-- Etqueta con formato class -->
+            <input type="text" id="nombreusuario" placeholder="Ingrese su nombre de Usuario" name="nombreusuario"
+                required><br><br> <!-- Input con nombre de usuario requerido, para que no deje el campo en blanco -->
+            <label class="label-login" for="password">Contraseña:</label> <!-- Etqueta con formato class -->
+            <input type="password" id="password" placeholder="Ingrese su Contraseña" name="password" required><br><br>
+            <!-- Input con contraseña requerida, para que no deje el campo en blanco -->
+            <button type="submit">Iniciar Sesión</button>
+            <!-- Boton "button" tipo submit para enviar los datos ingresados -->
+        </form>
+    </div>
+</body>
+
+</html>
