@@ -20,6 +20,11 @@ def serialize_data(rows):
 def index():
     return render_template('index.html')
 
+# Login
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 # Ruta para obtener todos los datos de la tabla turnos en el front-end
 @app.route('/get_data_turnos')
 def get_data():
