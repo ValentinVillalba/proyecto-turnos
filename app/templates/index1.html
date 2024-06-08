@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultorio del Dr. Amado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            width: 100%;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            /*position: fixed;*/
+            top: 0;
+        }
+        .container {
+            padding: 60px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .menu {
+            list-style: none;
+            padding: 0;
+        }
+        .menu li {
+            background: #fff;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .menu a {
+            display: block;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .menu a:hover {
+            background-color: #f4f4f9;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f4f4f9;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        .menu-item:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Consultorio del Dr. Amado</h1>
+    </div>
+    <div class="container">
+        <ul class="menu">
+            <li class="menu-item">
+                <a href="#">Gestión de Pacientes</a>
+                <div class="dropdown-content">
+                    <a href="cargar_datos.html">Carga de Datos de Pacientes</a>
+                    <a href="modificar_datos.html">Modificar Datos de Pacientes</a>
+                    <a href="eliminar_datos.html">Eliminar Datos de Pacientes</a>
+                </div>
+            </li>
+            <li class="menu-item">
+                <a href="#">Gestión de Turnos</a>
+                <div class="dropdown-content">
+                    <a href="cargar_turno.html">Carga de Turnos</a>
+                    <a href="inicializar_turnos.html">Inicialización de Turnos</a>
+                    <a href="cancelar_turnos.html">Cancelación de Turnos</a>
+                </div>
+            </li>
+            <li class="menu-item"><a href="reporte_turnos.html">Reporte de Turnos</a></li>
+        </ul>
+    </div>
+</body>
+</html>

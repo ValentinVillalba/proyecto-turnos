@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Nuevo Turno - Consultorio del Dr. Amado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .header {
+            width: 100%;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 80px;
+        }
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            font-size: 20px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-left: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        input[type="text"], input[type="number"], input[type="email"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 48%;
+            padding: 10px;
+            margin: 5px 1%;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            background-color: #28a745;
+            cursor: pointer;
+        }
+        button[type="reset"] {
+            background-color: #dc3545;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Consultorio del Dr. Amado</h1>
+    </div>
+    <div class="container">
+        <div class="vertical-text">
+            Agendar Nuevo Turno
+        </div>
+        <form id="appointmentForm">
+            <label for="appointmentDateTime">Fecha y Hora del Turno:</label>
+            <select id="appointmentDateTime" name="appointmentDateTime" required>
+                <!-- Opciones serán cargadas dinámicamente -->
+            </select>
+
+            <label for="dni">DNI del Paciente:</label>
+            <input type="number" id="dni" name="dni" maxlength="8" required>
+
+            <label for="patientName">Apellido y Nombre:</label>
+            <input type="text" id="patientName" name="patientName" maxlength="50" required>
+
+            <label for="socialSecurity">Obra Social:</label>
+            <input type="text" id="socialSecurity" name="socialSecurity" maxlength="50">
+
+            <label for="phone">Teléfono:</label>
+            <input type="text" id="phone" name="phone" maxlength="20">
+
+            <label for="email">Mail:</label>
+            <input type="email" id="email" name="email" maxlength="50">
+
+            <button type="submit">Quiero este Turno!</button>
+            <button type="reset">Limpiar Datos</button>
+        </form>
+    </div>
+
+    <!-- Modal para ingreso de nuevos datos del paciente -->
+    <div id="patientModal" style="display:none;">
+        <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); width: 300px; margin: 0 auto;">
+            <h2>Nuevo Paciente</h2>
+            <form id="newPatientForm">
+                <label for="newPatientName">Apellido y Nombre:</label>
+                <input type="text" id="newPatientName" name="newPatientName" maxlength="50" required>
+
+                <label for="newDni">DNI:</label>
+                <input type="number" id="newDni" name="newDni" maxlength="8" required>
+
+                <label for="newBirthdate">Fecha de Nacimiento:</label>
+                <input type="date" id="newBirthdate" name="newBirthdate" required>
+
+                <label for="newSocialSecurity">Obra Social:</label>
+                <input type="text" id="newSocialSecurity" name="newSocialSecurity" maxlength="50">
+
+                <label for="newPhone">Teléfono:</label>
+                <input type="text" id="newPhone" name="newPhone" maxlength="20">
+
+                <label for="newEmail">Mail:</label>
+                <input type="email" id="newEmail" name="newEmail" maxlength="50">
+
+                <label for="newAddress">Dirección:</label>
+                <input type="text" id="newAddress" name="newAddress" maxlength="80">
+
+                <button type="submit">Guardar Paciente</button>
+                <button type="button" onclick="closePatientModal()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar los turnos desde la base de datos (simulado aquí)
+            loadAvailableAppointments();
+        });
+
+        function loadAvailableAppointments() {
+            // Esta función debería hacer una llamada a la base de datos para obtener los próximos 5 turnos disponibles
+            const availableAppointments = [
+                { date: 'Jueves 11/07 09:00', days: 33 },
+                { date: 'Viernes 12/07 10:00', days: 34 },
+                { date: 'Lunes 15/07 11:00', days: 37 },
+                { date: 'Martes 16/07 12:00', days: 38 },
+                { date: 'Miércoles 17/07 13:00', days: 39 }
+            ];
+
+            const select = document.getElementById('appointmentDateTime');
+            availableAppointments.forEach(appointment => {
+                const option = document.createElement('option');
+                option.value = appointment.date;
+                option.textContent = `${appointment.date} (${appointment.days} días)`;
+                select.appendChild(option);
+            });
+        }
+
+        document.getElementById('appointmentForm').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const formElements = Array.from(this.elements);
+                const index = formElements.indexOf(document.activeElement);
+                if (index >= 0 && index < formElements.length - 1) {
+                    formElements[index + 1].focus();
+                }
+            }
+        });
+
+        document.getElementById('dni').addEventListener('blur', function() {
+            const dni = this.value;
+            // Simulamos una llamada a la base de datos
+            if (!checkPatientExists(dni)) {
+                openPatientModal();
+            } else {
+                fillPatientData(dni);
+            }
+        });
+
+        function checkPatientExists(dni) {
+            // Esta función debería consultar la base de datos. Aquí simulamos que el paciente no existe.
+            // Reemplaza este retorno con la lógica de tu base de datos.
+            return false;
+        }
+
+        function fillPatientData(dni) {
+            // Lógica para llenar los datos del paciente existente.
+            // Aquí deberías llenar los campos con los datos extraídos de la base de datos.
+            // Ejemplo:
+            // document.getElementById('patientName').value = 'Nombre Apellido';
+            // document.getElementById('socialSecurity').value = 'Obra Social';
+            // document.getElementById('phone').value = '123456789';
+            // document.getElementById('email').value = 'correo@example.com';
+        }
+
+        function openPatientModal() {
+            document.getElementById('patientModal').style.display = 'block';
+        }
+
+        function closePatientModal() {
+            document.getElementById('patientModal').style.display = 'none';
+        }
+
+        document.getElementById('newPatientForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            // Lógica para guardar los datos del nuevo paciente en la base de datos
+            // Luego cerrar el modal y llenar los datos en el formulario principal
+            const name = document.getElementById('newPatientName').value;
+            const socialSecurity = document.getElementById('newSocialSecurity').value;
+            const phone = document.getElementById('newPhone').value;
+            const email = document.getElementById('newEmail').value;
+            
+            document.getElementById('patientName').value = name;
+            document.getElementById('socialSecurity').value = socialSecurity;
+            document.getElementById('phone').value = phone;
+            document.getElementById('email').value = email;
+
+            closePatientModal();
+        });
+    </script>
+</body>
+</html>
