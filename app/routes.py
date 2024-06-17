@@ -29,7 +29,7 @@ def role_required(role):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if 'role' not in session or session['role'] != role:
-                flash('No tienes acceso a esta página.')
+                flash('Acceso denegado.')
                 return redirect(url_for('logout'))
             return f(*args, **kwargs)
         return decorated_function
@@ -53,6 +53,24 @@ def get_data():
     else:
         return jsonify([])
 
+# Ruta para obtener los turnos del usuario logueado
+@app.route('/get_turnos_usuario')
+@login_required
+@role_required('cliente')
+def get_data_usuario():
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        query = "SELECT * FROM turnos WHERE id_paciente = %s"
+        cursor.execute(query, (session['id_paciente'],))
+        rows = cursor.fetchall()
+        close_connection(connection)
+        rows = serialize_data(rows)
+        return jsonify(rows)
+    else:
+        return jsonify([])
+
+# Index login
 @app.route('/')
 def login():
     return render_template('login.html')
@@ -74,6 +92,7 @@ def login_post():
             # Guardar usuario en sesión
             session['username'] = user['nombre_usuario']
             session['role'] = user['rol']
+            session['id_paciente'] = user['id_paciente']
 
             # Verificar el rol y redirigir según el rol
             if user['rol'] == 'secretaria':
@@ -81,7 +100,7 @@ def login_post():
             elif user['rol'] == 'cliente':
                 return redirect(url_for('cliente_dashboard'))
         else:
-            flash('Usuario o password incorrecta, ingrese los datos nuevamente')
+            flash('Usuario o contraseña incorrecta, ingrese los datos nuevamente')
             return redirect(url_for('login'))
     else:
         return jsonify([])
@@ -107,3 +126,9 @@ def cliente_dashboard():
 @login_required
 def altaturno():
     return render_template('altaturno.html')
+
+@app.route('/mis_turnos')
+@login_required
+@role_required('cliente')
+def mis_turnos():
+    return render_template('mis_turnos.html')
