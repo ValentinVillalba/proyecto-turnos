@@ -54,6 +54,6 @@ class Usuarios(db.Model):
     __tablename__ = 'usuarios'
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre_usuario = db.Column(db.String(30), nullable=False)
-    contraseña = db.Column(db.String(8), nullable=False)
+    password = db.Column(db.String(20), nullable=False)
     rol = db.Column(db.Enum('secretaria', 'cliente'), nullable=False)
     id_paciente = db.Column(db.Integer, db.ForeignKey('pacientes.id_paciente'), nullable=False)

@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date
 from app import app, db
 from app.models import Pacientes
 
