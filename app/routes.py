@@ -45,7 +45,7 @@ def get_data():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM turnos")
+        cursor.execute("SELECT * FROM turnos JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente")
         rows = cursor.fetchall()
         close_connection(connection)
         rows = serialize_data(rows)
@@ -61,14 +61,88 @@ def get_data_usuario():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
-        query = "SELECT * FROM turnos WHERE id_paciente = %s"
-        cursor.execute(query, (session['id_paciente'],))
+        query = "SELECT * FROM turnos JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente WHERE pacientes.obra_soc = %s"
+        cursor.execute(query, (session['obra_soc'],))
         rows = cursor.fetchall()
         close_connection(connection)
         rows = serialize_data(rows)
         return jsonify(rows)
     else:
         return jsonify([])
+    
+# Ruta para ver turnos pendientes del usuario unicamente
+@app.route('/get_turnos_pendientes')
+@login_required
+@role_required('cliente')
+def get_turnos_pendientes():
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        query = "SELECT * FROM turnos JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente WHERE pacientes.obra_soc = %s AND turnos.estado = 1"
+        cursor.execute(query, (session['obra_soc'],))
+        rows = cursor.fetchall()
+        close_connection(connection)
+        rows = serialize_data(rows)
+        return jsonify(rows)
+    else:
+        return jsonify([])
+    
+# Ruta para ver todos los turnos pendientes
+@app.route('/get_all_turnos_pendientes')
+@login_required
+@role_required('secretaria')
+def get_all_turnos_pendientes():
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        query = "SELECT * FROM turnos WHERE estado = 1"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        close_connection(connection)
+        rows = serialize_data(rows)
+        return jsonify(rows)
+    else:
+        return jsonify([])
+    
+# Ruta para cancelar turnos
+@app.route('/cancelar_turno', methods=['POST'])
+@login_required
+def cancelar_turno():
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        try:
+            id_turno = request.json['id_turno']
+            query = "UPDATE turnos SET estado = 0 WHERE id_turno = %s"
+            cursor.execute(query, (id_turno,))
+            connection.commit()
+            close_connection(connection)
+            return jsonify({'message': 'Turno cancelado correctamente'})
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({'message': 'Error al cancelar el turno'})
+    else:
+        return jsonify({'message': 'Error al conectar a la base de datos'})
+
+# Ruta para cancelar los turnos vencidos
+@app.route('/cancelar_turnos_vencidos', methods=['POST'])
+@login_required
+@role_required('secretaria')
+def cancelar_turnos_vencidos():
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        try:
+            query = "UPDATE turnos SET estado = 0 WHERE fecha < CURDATE() AND estado = 1"
+            cursor.execute(query)
+            connection.commit()
+            close_connection(connection)
+            return jsonify({'message': 'Turnos vencidos cancelados correctamente'})
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({'message': 'Error al cancelar los turnos vencidos'})
+    else:
+        return jsonify({'message': 'Error al conectar a la base de datos'})
 
 # Index login
 @app.route('/')
@@ -92,7 +166,7 @@ def login_post():
             # Guardar usuario en sesión
             session['username'] = user['nombre_usuario']
             session['role'] = user['rol']
-            session['id_paciente'] = user['id_paciente']
+            session['obra_soc'] = user['obra_soc']
 
             # Verificar el rol y redirigir según el rol
             if user['rol'] == 'secretaria':
@@ -140,3 +214,14 @@ def mis_turnos():
 def cancelar_turnos():
     return render_template('cancelar_turno.html')
 
+@app.route('/cancelar_turnos_admin')
+@login_required
+@role_required('secretaria')
+def cancelar_turnos_admin():
+    return render_template('cancelar_turno_admin.html')
+
+@app.route('/todos_los_turnos')
+@login_required
+@role_required('secretaria')
+def todos_los_turnos():
+    return render_template('todos_los_turnos.html')

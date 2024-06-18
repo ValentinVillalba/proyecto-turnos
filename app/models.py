@@ -40,7 +40,7 @@ class Pacientes(db.Model):
     telefono = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(30), nullable=False)
     direccion = db.Column(db.String(30), nullable=False)
-    estado = db.Column(db.Boolean, nullable=False)
+    turnos = db.relationship('Turnos', backref='paciente', lazy=True)
 
 class Turnos(db.Model):
     __tablename__ = 'turnos'
@@ -56,4 +56,4 @@ class Usuarios(db.Model):
     nombre_usuario = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(20), nullable=False)
     rol = db.Column(db.Enum('secretaria', 'cliente'), nullable=False)
-    id_paciente = db.Column(db.Integer, db.ForeignKey('pacientes.id_paciente'), nullable=False)
+    obra_soc = db.Column(db.String(30), nullable=True)

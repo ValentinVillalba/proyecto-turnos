@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultorio del Dr. Amado - Cancelar Turno</title>
+    <title>Consultorio del Dr. Amado</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <script src="{{ url_for('static', filename='js/cancelar_script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/todos_los_turnos_script.js') }}"></script>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -16,10 +16,10 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin: 0;
-            padding: 0;
+            padding: 0 ;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            justify-content:space-between;
+            align-items: flex-start; /* Cambiado de center a flex-start */
             height: 100vh;
             flex-direction: column;
         }
@@ -38,8 +38,8 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 600px;
-            margin-top: 85px;
+            max-width: 600px; /* Ajustado de 400px a 600px */
+            margin-top: 100px; /* Ajusta según sea necesario */
         }
         label {
             display: block;
@@ -77,7 +77,7 @@
             color: #000000 !important;
         }
         .table-container {
-            margin-top: 20px;
+            margin-top: 20px; /* Ajusta según sea necesario */
         }
     </style>
 </head>
@@ -86,33 +86,15 @@
         <h1>Consultorio del Dr. Amado</h1>
     </div>
     <div class="container">
-        
-        <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title black-text" id="exampleModalLabel">Confirmar cancelación</h5>
-                </div>
-                <div class="modal-body black-text">
-                  ¿Cancelar este turno?
-                </div>
-                <div class="modal-footer flex">
-                  <button style="width: 100px;" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                  <button style="width: 100px;" type="button" class="btn btn-primary btn-danger" id="confirmCancel">Confirmar</button>
-                </div>
-              </div>
-            </div>
-        </div>
-
-        <h2 class="black-text">Cancelar Turnos</h2>
+        <h2 class="black-text">Todos los turnos</h2>
         <div class="table-container">
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Fecha</th>
                         <th>Hora</th>
+                        <th>DNI Paciente</th>
                         <th>Estado</th>
-                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-turnos">
@@ -120,7 +102,7 @@
                 </tbody>
             </table>
         </div>
-        <a style="margin: 4.6px;" class="btn btn-secondary" href="{{ url_for('cliente_dashboard') }}">Volver atrás</a>
+        <a style="margin: 4.6px;" class="btn btn-secondary" href="{{ url_for('secretaria_dashboard') }}">Volver atrás</a>
     </div>
 </body>
 </html>

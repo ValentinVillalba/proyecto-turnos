@@ -1,15 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('/get_turnos_pendientes')
+    document.getElementById('boton-vencidos').setAttribute('disabled', 'disabled');
+
+    fetch('/get_all_turnos_pendientes')
         .then(response => response.json())
         .then(data => {
             const tbody = document.querySelector('#tabla-turnos');
             data.forEach(turno => {
-
-                // No muestra turnos vencidos
-                if (new Date(turno.fecha) < new Date()) {
-                    return;
-                }
-
                 const row = document.createElement('tr');
 
                 const fechaCell = document.createElement('td');
@@ -26,7 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.appendChild(horaCell);
 
                 const estadoCell = document.createElement('td');
-                estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
+                if(turno.estado == 1 && new Date(turno.fecha) < new Date()){
+                    estadoCell.textContent = "Vencido";
+                }
+                else{
+                    estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
+                }
                 row.appendChild(estadoCell);
 
                 const accionesCell = document.createElement('td');
@@ -45,6 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.appendChild(accionesCell);
 
                 tbody.appendChild(row);
+
+                if (new Date(turno.fecha) < new Date()) {
+                    document.getElementById('boton-vencidos').removeAttribute('disabled');
+                }
+                
             });
         })
         .catch(error => console.error('Error fetching turnos:', error));
@@ -55,7 +61,21 @@ document.addEventListener('DOMContentLoaded', function() {
             var modal = bootstrap.Modal.getInstance(myModalEl)
             modal.hide();
         });
+
+        document.getElementById('confirmCancelAll').addEventListener('click', function() {
+            cancelarTurnosVencidos();
+            var myModalEl = document.getElementById('cancelAllModal');
+            var modal = bootstrap.Modal.getInstance(myModalEl)
+            modal.hide();
+        });
 });
+
+function abrirModalCancelarTodos() {
+    var myModal = new bootstrap.Modal(document.getElementById('cancelAllModal'), {
+        keyboard: false
+    })
+    myModal.show();
+}
 
 function cancelarTurno(id, row) {
     fetch(`/cancelar_turno`, {
@@ -72,6 +92,25 @@ function cancelarTurno(id, row) {
             row.querySelector('td:nth-child(4)').textContent = '';
         } else {
             console.error('Error cancelando el turno:', data.message);
+        }
+    })
+    .catch(error => console.error('Error en la solicitud de cancelación:', error));
+}
+
+function cancelarTurnosVencidos(){
+    fetch(`/cancelar_turnos_vencidos`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Turnos vencidos cancelados correctamente') {
+            console.log('Turnos cancelados correctamente');
+            window.location.reload();
+        } else {
+            console.error('Error cancelando los turnos:', data.message);
         }
     })
     .catch(error => console.error('Error en la solicitud de cancelación:', error));

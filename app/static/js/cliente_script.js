@@ -2,14 +2,23 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('/get_turnos_usuario')
         .then(response => response.json())
         .then(data => {
-            console.log('Data:', data); // Verifica los datos recibidos
             const tbody = document.querySelector('#tabla-turnos');
-            console.log('Tbody:', tbody); // Verifica el tbody seleccionado
+            if (data[0] == undefined) {
+                console.log("No hay turnos");
+            }
+            else{
+                document.getElementById('obra-social-slot').innerHTML = data[0].obra_soc;
+            }
             data.forEach(turno => {
                 const row = document.createElement('tr');
 
                 const fechaCell = document.createElement('td');
-                fechaCell.textContent = turno.fecha;
+                let fecha = new Date(turno.fecha);
+                let day = fecha.getDate();
+                let month = fecha.getMonth() + 1;
+                let year = fecha.getFullYear();
+
+                fechaCell.textContent = `${day}/${month}/${year}`;
                 row.appendChild(fechaCell);
 
                 const horaCell = document.createElement('td');
@@ -17,12 +26,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.appendChild(horaCell);
 
                 const estadoCell = document.createElement('td');
-                estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Vencido";
+                if (new Date(turno.fecha) < new Date()) {
+                    estadoCell.textContent = "Vencido";
+                }
+                else{
+                    estadoCell.textContent = "Pendiente"
+                }
                 row.appendChild(estadoCell);
 
-                const accionesCell = document.createElement('td');
-                accionesCell.textContent = ''; // Columna vacía por ahora
-                row.appendChild(accionesCell);
+                const dniCell = document.createElement('td');
+                dniCell.textContent = turno.dni;
+                row.appendChild(dniCell);
 
                 tbody.appendChild(row);
             });

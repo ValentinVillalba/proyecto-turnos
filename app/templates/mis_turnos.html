@@ -15,7 +15,7 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
-            margin: 2rem;
+            margin: 0;
             padding: 0 ;
             display: flex;
             justify-content:space-between;
@@ -39,7 +39,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 600px; /* Ajustado de 400px a 600px */
-            margin-top: 60px; /* Ajusta según sea necesario */
+            margin-top: 100px; /* Ajusta según sea necesario */
         }
         label {
             display: block;
@@ -87,6 +87,7 @@
     </div>
     <div class="container">
         <h2 class="black-text">Mis turnos</h2>
+        <h3 class="black-text" id="obra-social-slot"></h3>
         <div class="table-container">
             <table class="table table-striped">
                 <thead>
@@ -94,7 +95,7 @@
                         <th>Fecha</th>
                         <th>Hora</th>
                         <th>Estado</th>
-                        <th></th> <!-- Columna vacía por ahora -->
+                        <th>DNI Paciente</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-turnos">

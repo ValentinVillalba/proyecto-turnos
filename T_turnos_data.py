@@ -7,11 +7,11 @@ from app.models import Turnos
 def insert_data():
     with app.app_context():
         turnos = [
-            Turnos(fecha=date(2024, 6, 5), hora=time(9, 0), estado=True, id_paciente=1),
-            Turnos(fecha=date(2024, 6, 5), hora=time(10, 0), estado=True, id_paciente=2),
-            Turnos(fecha=date(2024, 6, 5), hora=time(11, 0), estado=True, id_paciente=3),
-            Turnos(fecha=date(2024, 6, 6), hora=time(9, 0), estado=True, id_paciente=4),
-            Turnos(fecha=date(2024, 6, 6), hora=time(10, 0), estado=True, id_paciente=5)
+            Turnos(fecha=date(2024, 7, 10), hora=time(9, 0), estado=True, id_paciente=1),
+            Turnos(fecha=date(2024, 7, 12), hora=time(10, 0), estado=True, id_paciente=2),
+            Turnos(fecha=date(2024, 8, 3), hora=time(11, 0), estado=True, id_paciente=3),
+            Turnos(fecha=date(2024, 6, 1), hora=time(9, 0), estado=True, id_paciente=4),
+            Turnos(fecha=date(2024, 6, 24), hora=time(10, 0), estado=True, id_paciente=5)
         ]
         
         print("TURNOS INSERTADOS CORRECTAMENTE")

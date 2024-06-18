@@ -48,6 +48,7 @@
             background-color: #333;
             color: #fff;
             font-size: 20px;
+            z-index: -10;
         }
         form {
             background: #fff;
@@ -97,7 +98,7 @@
         <div class="vertical-text">
             Agendar Nuevo Turno
         </div>
-        <form id="appointmentForm">
+        <form id="appointmentForm" style="margin-top: 280px; margin-bottom: 20px;">
             <label for="appointmentDateTime">Fecha y Hora del Turno:</label>
             <select id="appointmentDateTime" name="appointmentDateTime" required>
                 <!-- Opciones serán cargadas dinámicamente -->
@@ -120,8 +121,8 @@
 
             <button type="submit">Quiero este Turno!</button>
             <button type="reset">Limpiar Datos</button>
-
-            <a href="{{ url_for('cliente_dashboard') }}">Volver atrás</a>
+            <br>
+            <a style="margin: 4.6px;" class="btn btn-secondary" href="{{ url_for('secretaria_dashboard') }}">Volver atrás</a>
         </form>
     </div>
 

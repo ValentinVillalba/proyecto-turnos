@@ -2,13 +2,17 @@ from app import app, db
 from app.models import Usuarios
 
 #Este es un archivo para insertar usuarios de prueba en la tabla de usuarios.
+#USAR ESTE ARCHIVO SOLAMENTE UNA VEZ!!! Comentar usuario "admin" si se necesita usar de nuevo.
 
 def insert_users():
     with app.app_context():
         users = [
-            Usuarios(nombre_usuario='admin', password='admin123', rol='secretaria', id_paciente=1),
-            #TODO: Cambiar cliente por OBRA SOCIAL
-            Usuarios(nombre_usuario='cliente', password='cliente123', rol='cliente', id_paciente=2)
+            Usuarios(nombre_usuario='admin', password='admin123', rol='secretaria'),
+
+            # Usuarios de prueba para las obras sociales
+            Usuarios(nombre_usuario='osde', password='osde123', rol='cliente', obra_soc='OSDE'),
+            Usuarios(nombre_usuario='ioma', password='ioma123', rol='cliente', obra_soc='IOMA'),
+            Usuarios(nombre_usuario='osecac', password='osecac123', rol='cliente', obra_soc='OSECAC')
         ]
         
         print("USUARIOS INSERTADOS CORRECTAMENTE")
