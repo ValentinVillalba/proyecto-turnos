@@ -7,6 +7,7 @@ def insert_users():
     with app.app_context():
         users = [
             Usuarios(nombre_usuario='admin', password='admin123', rol='secretaria', id_paciente=1),
+            #TODO: Cambiar cliente por OBRA SOCIAL
             Usuarios(nombre_usuario='cliente', password='cliente123', rol='cliente', id_paciente=2)
         ]
         

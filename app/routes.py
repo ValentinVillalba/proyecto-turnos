@@ -132,3 +132,11 @@ def altaturno():
 @role_required('cliente')
 def mis_turnos():
     return render_template('mis_turnos.html')
+
+
+@app.route('/cancelar_turnos')
+@login_required
+@role_required('cliente')
+def cancelar_turnos():
+    return render_template('cancelar_turno.html')
+
