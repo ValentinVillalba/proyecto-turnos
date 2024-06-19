@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.message === 'Paciente agregado correctamente') {
                 alert('Paciente agregado correctamente');
                 form.reset();
+                window.location.reload();
             } else {
                 console.error('Error al agregar paciente:', result.message);
             }
