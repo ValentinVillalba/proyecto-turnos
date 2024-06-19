@@ -1,8 +1,8 @@
-from datetime import date, time, timedelta
+from datetime import date, datetime, time, timedelta
 from functools import wraps
 from flask import jsonify, render_template, request, redirect, url_for, flash, session
-from app.models import create_connection, close_connection
-from app import app
+from app.models import Pacientes, create_connection, close_connection
+from app import app, db
 
 app.secret_key = 'supersecretkey'  # Necesario para usar flash messages
 
@@ -225,3 +225,77 @@ def cancelar_turnos_admin():
 @role_required('secretaria')
 def todos_los_turnos():
     return render_template('todos_los_turnos.html')
+
+@app.route('/agregar_paciente', methods=['POST'])
+@login_required
+@role_required('secretaria')
+def add_patient():
+    data = request.json
+    nombre = data.get('newPatientName')
+    dni = data.get('newDni')
+    fecha_nac = datetime.strptime(data.get('newBirthdate'), '%Y-%m-%d').date()
+    obra_soc = data.get('newObraSocial')
+    telefono = data.get('newPhone')
+    email = data.get('newEmail')
+    direccion = data.get('newAddress')
+    
+    nuevo_paciente = Pacientes(
+        nombre=nombre,
+        dni=dni,
+        fecha_nac=fecha_nac,
+        obra_soc=obra_soc,
+        telefono=telefono,
+        email=email,
+        direccion=direccion
+    )
+    
+    db.session.add(nuevo_paciente)
+    db.session.commit()
+    
+    return jsonify({'message': 'Paciente agregado correctamente'})
+
+@app.route('/get_pacientes')
+@login_required
+@role_required('secretaria')
+def get_pacientes():
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        query = "SELECT * FROM pacientes"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        close_connection(connection)
+        rows = serialize_data(rows)
+        return jsonify(rows)
+    else:
+        return jsonify([])
+    
+@app.route('/asignar_turno', methods=['POST'])
+@login_required
+@role_required('secretaria')
+def asignar_turno():
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        try:
+            dni = request.json['dni']
+            fecha = request.json['appointmentDate']
+            hora = request.json['appointmentTime']
+            
+            cursor.execute("SELECT id_paciente FROM pacientes WHERE dni = %s", (dni,))
+            result = cursor.fetchone()
+            if result is None:
+                return jsonify({'message': 'DNI no encontrado'})
+
+            id_paciente = result['id_paciente']
+
+            query = "INSERT INTO turnos (fecha, hora, estado, id_paciente) VALUES (%s, %s, 1, %s)"
+            cursor.execute(query, (fecha, hora, id_paciente))
+            connection.commit()
+            close_connection(connection)
+            return jsonify({'message': 'Turno asignado correctamente'})
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({'message': 'Error al asignar el turno'})
+    else:
+        return jsonify({'message': 'Error al conectar a la base de datos'})

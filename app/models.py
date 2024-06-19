@@ -40,7 +40,6 @@ class Pacientes(db.Model):
     telefono = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(30), nullable=False)
     direccion = db.Column(db.String(30), nullable=False)
-    turnos = db.relationship('Turnos', backref='paciente', lazy=True)
 
 class Turnos(db.Model):
     __tablename__ = 'turnos'

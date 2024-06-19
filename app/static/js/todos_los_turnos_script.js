@@ -6,33 +6,33 @@ document.addEventListener('DOMContentLoaded', () => {
         data.forEach(turno => {
             const row = document.createElement('tr');
 
-                const fechaCell = document.createElement('td');
-                let fecha = new Date(turno.fecha);
-                let day = fecha.getDate();
-                let month = fecha.getMonth() + 1;
-                let year = fecha.getFullYear();
+            const fechaCell = document.createElement('td');
+            const fechaUTC = new Date(turno.fecha + 'T00:00:00Z');
+            let day = fechaUTC.getUTCDate();
+            let month = fechaUTC.getUTCMonth() + 1;
+            let year = fechaUTC.getUTCFullYear();
+            
+            fechaCell.textContent = `${day}/${month}/${year}`;
+            row.appendChild(fechaCell);
 
-                fechaCell.textContent = `${day}/${month}/${year}`;
-                row.appendChild(fechaCell);
+            const horaCell = document.createElement('td');
+            horaCell.textContent = turno.hora;
+            row.appendChild(horaCell);
 
-                const horaCell = document.createElement('td');
-                horaCell.textContent = turno.hora;
-                row.appendChild(horaCell);
+            const pacienteCell = document.createElement('td');
+            pacienteCell.textContent = turno.dni;
+            row.appendChild(pacienteCell);
 
-                const pacienteCell = document.createElement('td');
-                pacienteCell.textContent = turno.dni;
-                row.appendChild(pacienteCell);
+            const estadoCell = document.createElement('td');
+            if(turno.estado == 1 && new Date(turno.fecha) < new Date()){
+                estadoCell.textContent = "Vencido";
+            }
+            else{
+                estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
+            }
+            row.appendChild(estadoCell);
 
-                const estadoCell = document.createElement('td');
-                if(turno.estado == 1 && new Date(turno.fecha) < new Date()){
-                    estadoCell.textContent = "Vencido";
-                }
-                else{
-                    estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
-                }
-                row.appendChild(estadoCell);
-
-                tbody.appendChild(row);
+            tbody.appendChild(row);
         });
     })
 });

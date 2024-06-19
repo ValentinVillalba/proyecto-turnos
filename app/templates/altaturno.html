@@ -6,10 +6,16 @@
         <title>Agendar Nuevo Turno - Consultorio del Dr. Amado</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script src="{{ url_for('static', filename='js/altaturno_script.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     
         <!-- Bootstrap -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+        <!-- Pikaday -->
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.2/css/pikaday.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.2/pikaday.min.js"></script>
     </head>
     <style>
         body {
@@ -88,6 +94,29 @@
         button:hover {
             opacity: 0.9;
         }
+        .nuevo-paciente-style{
+            background: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            margin-left: 0 !important;
+        }
+        .black-text{
+            color: #000000 !important;
+        }
+        .boton-custom{
+            width: 48%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+        }
+        .flex{
+            display: flex;
+        }
+        .btn-disabled{
+            background-color: #68a376;
+            cursor: not-allowed;
+        }
     </style>
 
 <body>
@@ -98,152 +127,64 @@
         <div class="vertical-text">
             Agendar Nuevo Turno
         </div>
-        <form id="appointmentForm" style="margin-top: 280px; margin-bottom: 20px;">
-            <label for="appointmentDateTime">Fecha y Hora del Turno:</label>
-            <select id="appointmentDateTime" name="appointmentDateTime" required>
-                <!-- Opciones serán cargadas dinámicamente -->
+        <form id="appointmentForm">
+            <label for="appointmentDate">Fecha del Turno:</label>
+            <input type="text" id="appointmentDate" name="appointmentDate" required>
+            <label for="appointmentTime">Hora del Turno:</label>
+            <select id="appointmentTime">
+                <!-- Las opciones llegan por JS -->
             </select>
+            
 
             <label for="dni">DNI del Paciente:</label>
-            <input type="number" id="dni" name="dni" maxlength="8" required>
-
-            <label for="patientName">Apellido y Nombre:</label>
-            <input type="text" id="patientName" name="patientName" maxlength="50" required>
-
-            <label for="socialSecurity">Obra Social:</label>
-            <input type="text" id="socialSecurity" name="socialSecurity" maxlength="50">
-
-            <label for="phone">Teléfono:</label>
-            <input type="text" id="phone" name="phone" maxlength="20">
-
-            <label for="email">Mail:</label>
-            <input type="email" id="email" name="email" maxlength="50">
-
-            <button type="submit">Quiero este Turno!</button>
-            <button type="reset">Limpiar Datos</button>
+            <input type="number" id="dni" name="dni" maxlength="8" required style="margin-bottom: 10px;">
+            <div id="dniError" style="display: none; color: red; margin-bottom: 10px;">DNI no encontrado!</div>
+            
+            <button id="asignarTurno" type="submit" style="margin: 0 0 10px 0;">Asignar Turno</button>
             <br>
-            <a style="margin: 4.6px;" class="btn btn-secondary" href="{{ url_for('secretaria_dashboard') }}">Volver atrás</a>
+            <button class="btn btn-primary boton-custom" style="margin: 0 0 10px 0;" onclick="$('#nuevoPacienteModal').modal('show');">Registrar Nuevo Paciente</button>
+            <br>
+            <a style="margin: 0 0 10px 0;" class="btn btn-secondary boton-custom" href="{{ url_for('secretaria_dashboard') }}">Volver atrás</a>
         </form>
     </div>
 
-    <!-- Modal para ingreso de nuevos datos del paciente -->
-    <div id="patientModal" style="display:none;">
-        <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); width: 300px; margin: 0 auto;">
-            <h2>Nuevo Paciente</h2>
-            <form id="newPatientForm">
-                <label for="newPatientName">Apellido y Nombre:</label>
-                <input type="text" id="newPatientName" name="newPatientName" maxlength="50" required>
+    <div id="nuevoPacienteModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title black-text">Nuevo Paciente</h5>
+            </div>
+            <div class="modal-body">
+                <form id="newPatientForm" class="nuevo-paciente-style">
+                    <label for="newPatientName">Apellido y Nombre:</label>
+                    <input type="text" id="newPatientName" name="newPatientName" maxlength="50" required>
+    
+                    <label for="newDni">DNI:</label>
+                    <input type="number" id="newDni" name="newDni" maxlength="8" required>
+    
+                    <label for="newBirthdate">Fecha de Nacimiento:</label>
+                    <input type="date" id="newBirthdate" name="newBirthdate" required>
+    
+                    <label for="newObraSocial">Obra Social:</label>
+                    <input type="text" id="newObraSocial" name="newObraSocial" maxlength="50">
+    
+                    <label for="newPhone">Teléfono:</label>
+                    <input type="text" id="newPhone" name="newPhone" maxlength="20">
+    
+                    <label for="newEmail">E-Mail:</label>
+                    <input type="email" id="newEmail" name="newEmail" maxlength="50">
+    
+                    <label for="newAddress">Dirección:</label>
+                    <input type="text" id="newAddress" name="newAddress" maxlength="80">
 
-                <label for="newDni">DNI:</label>
-                <input type="number" id="newDni" name="newDni" maxlength="8" required>
-
-                <label for="newBirthdate">Fecha de Nacimiento:</label>
-                <input type="date" id="newBirthdate" name="newBirthdate" required>
-
-                <label for="newSocialSecurity">Obra Social:</label>
-                <input type="text" id="newSocialSecurity" name="newSocialSecurity" maxlength="50">
-
-                <label for="newPhone">Teléfono:</label>
-                <input type="text" id="newPhone" name="newPhone" maxlength="20">
-
-                <label for="newEmail">Mail:</label>
-                <input type="email" id="newEmail" name="newEmail" maxlength="50">
-
-                <label for="newAddress">Dirección:</label>
-                <input type="text" id="newAddress" name="newAddress" maxlength="80">
-
-                <button type="submit">Guardar Paciente</button>
-                <button type="button" onclick="closePatientModal()">Cancelar</button>
-            </form>
+                    <div class="flex">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#nuevoPacienteModal').modal('hide');">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Paciente</button>
+                    </div>
+                </form>
+            </div>
+          </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cargar los turnos desde la base de datos (simulado aquí)
-            loadAvailableAppointments();
-        });
-
-        function loadAvailableAppointments() {
-            // Esta función debería hacer una llamada a la base de datos para obtener los próximos 5 turnos disponibles
-            const availableAppointments = [
-                { date: 'Jueves 11/07 09:00', days: 33 },
-                { date: 'Viernes 12/07 10:00', days: 34 },
-                { date: 'Lunes 15/07 11:00', days: 37 },
-                { date: 'Martes 16/07 12:00', days: 38 },
-                { date: 'Miércoles 17/07 13:00', days: 39 }
-            ];
-
-            const select = document.getElementById('appointmentDateTime');
-            availableAppointments.forEach(appointment => {
-                const option = document.createElement('option');
-                option.value = appointment.date;
-                option.textContent = `${appointment.date} (${appointment.days} días)`;
-                select.appendChild(option);
-            });
-        }
-
-        document.getElementById('appointmentForm').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const formElements = Array.from(this.elements);
-                const index = formElements.indexOf(document.activeElement);
-                if (index >= 0 && index < formElements.length - 1) {
-                    formElements[index + 1].focus();
-                }
-            }
-        });
-
-        document.getElementById('dni').addEventListener('blur', function() {
-            const dni = this.value;
-            // Simulamos una llamada a la base de datos
-            if (!checkPatientExists(dni)) {
-                openPatientModal();
-            } else {
-                fillPatientData(dni);
-            }
-        });
-
-        function checkPatientExists(dni) {
-            // Esta función debería consultar la base de datos. Aquí simulamos que el paciente no existe.
-            // Reemplaza este retorno con la lógica de tu base de datos.
-            return false;
-        }
-
-        function fillPatientData(dni) {
-            // Lógica para llenar los datos del paciente existente.
-            // Aquí deberías llenar los campos con los datos extraídos de la base de datos.
-            // Ejemplo:
-            // document.getElementById('patientName').value = 'Nombre Apellido';
-            // document.getElementById('socialSecurity').value = 'Obra Social';
-            // document.getElementById('phone').value = '123456789';
-            // document.getElementById('email').value = 'correo@example.com';
-        }
-
-        function openPatientModal() {
-            document.getElementById('patientModal').style.display = 'block';
-        }
-
-        function closePatientModal() {
-            document.getElementById('patientModal').style.display = 'none';
-        }
-
-        document.getElementById('newPatientForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            // Lógica para guardar los datos del nuevo paciente en la base de datos
-            // Luego cerrar el modal y llenar los datos en el formulario principal
-            const name = document.getElementById('newPatientName').value;
-            const socialSecurity = document.getElementById('newSocialSecurity').value;
-            const phone = document.getElementById('newPhone').value;
-            const email = document.getElementById('newEmail').value;
-            
-            document.getElementById('patientName').value = name;
-            document.getElementById('socialSecurity').value = socialSecurity;
-            document.getElementById('phone').value = phone;
-            document.getElementById('email').value = email;
-
-            closePatientModal();
-        });
-    </script>
 </body>
 </html>

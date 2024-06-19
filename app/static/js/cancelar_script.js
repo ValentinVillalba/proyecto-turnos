@@ -13,11 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const row = document.createElement('tr');
 
                 const fechaCell = document.createElement('td');
-                let fecha = new Date(turno.fecha);
-                let day = fecha.getDate();
-                let month = fecha.getMonth() + 1;
-                let year = fecha.getFullYear();
-
+                const fechaUTC = new Date(turno.fecha + 'T00:00:00Z');
+                let day = fechaUTC.getUTCDate();
+                let month = fechaUTC.getUTCMonth() + 1;
+                let year = fechaUTC.getUTCFullYear();
+                
                 fechaCell.textContent = `${day}/${month}/${year}`;
                 row.appendChild(fechaCell);
 
