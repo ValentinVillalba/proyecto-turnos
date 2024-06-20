@@ -161,6 +161,8 @@
     
                     <label for="newDni">DNI:</label>
                     <input type="number" id="newDni" name="newDni" maxlength="8" required>
+                    <div id="newDniError" style="display: none; color: red; margin-bottom: 10px;">El DNI ya está registrado!</div>
+                    <div id="dniValidoError" style="display: none; color: red; margin-bottom: 10px;">El DNI no es válido!</div>
     
                     <label for="newBirthdate">Fecha de Nacimiento:</label>
                     <input type="date" id="newBirthdate" name="newBirthdate" required>
@@ -179,7 +181,7 @@
 
                     <div class="flex">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#nuevoPacienteModal').modal('hide');">Cerrar</button>
-                        <button type="submit" class="btn btn-primary">Guardar Paciente</button>
+                        <button type="submit" id="nuevoPacienteButton" class="btn btn-primary">Guardar Paciente</button>
                     </div>
                 </form>
             </div>

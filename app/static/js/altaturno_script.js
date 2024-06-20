@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
+        data.newObraSocial = data.newObraSocial.toLowerCase();
         
         fetch('/agregar_paciente', {
             method: 'POST',
@@ -24,6 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => console.error('Error en la solicitud de agregar paciente:', error));
+    });
+
+    document.getElementById('newObraSocial').addEventListener('input', function() {
+        this.value = this.value.toLowerCase();
     });
 
     const dateInput = document.getElementById('appointmentDate');
@@ -86,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('dni').addEventListener('input', function() {
         var dni = parseInt(this.value);
-        if (!isNaN(dni) && dni.toString().length === 8) {
+        if (!isNaN(dni) && dni.toString().length >= 7) {
             if (!dniArray.includes(dni)) {
                 document.getElementById('dniError').style.display = 'block';
                 document.getElementById('asignarTurno').disabled = true;
@@ -100,6 +105,28 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('dniError').style.display = 'block';
             document.getElementById('asignarTurno').disabled = true;
             document.getElementById('asignarTurno').classList.add('btn-disabled');
+        }
+    });
+
+    document.getElementById('newDni').addEventListener('input', function() {
+        var newDni = parseInt(this.value);
+        if (!isNaN(newDni) && newDni.toString().length >= 7 && newDni.toString().length < 9){
+            if (dniArray.includes(newDni)) {
+                document.getElementById('newDniError').style.display = 'block';
+                document.getElementById('nuevoPacienteButton').disabled = true;
+                document.getElementById('nuevoPacienteButton').classList.add('btn-disabled');
+                document.getElementById('dniValidoError').style.display = 'none';
+            } else {
+                document.getElementById('newDniError').style.display = 'none';
+                document.getElementById('nuevoPacienteButton').disabled = false;
+                document.getElementById('nuevoPacienteButton').classList.remove('btn-disabled');
+                document.getElementById('dniValidoError').style.display = 'none';
+            }
+        } else {
+            document.getElementById('newDniError').style.display = 'none';
+            document.getElementById('dniValidoError').style.display = 'block';
+            document.getElementById('nuevoPacienteButton').disabled = true;
+            document.getElementById('nuevoPacienteButton').classList.add('btn-disabled');
         }
     });
 
@@ -128,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.message === 'Turno asignado correctamente') {
                 alert('Turno asignado correctamente');
                 appointmentForm.reset();
+                window.location.reload();
             } else {
                 console.error('Error al asignar turno:', result.message);
             }

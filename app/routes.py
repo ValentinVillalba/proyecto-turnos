@@ -234,7 +234,7 @@ def add_patient():
     nombre = data.get('newPatientName')
     dni = data.get('newDni')
     fecha_nac = datetime.strptime(data.get('newBirthdate'), '%Y-%m-%d').date()
-    obra_soc = data.get('newObraSocial')
+    obra_soc = data.get('newObraSocial').lower()
     telefono = data.get('newPhone')
     email = data.get('newEmail')
     direccion = data.get('newAddress')
