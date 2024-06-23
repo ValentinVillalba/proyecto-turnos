@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Datos del Paciente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .header {
+            width: 100%;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 80px;
+        }
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            font-size: 20px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-left: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        input[type="text"], input[type="number"], input[type="date"], input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 48%;
+            padding: 10px;
+            margin: 5px 1%;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            background-color: #28a745;
+            cursor: pointer;
+        }
+        button[type="reset"] {
+            background-color: #dc3545;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .back-button {
+            background-color: #007bff;
+        }
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Modificar Datos del Paciente</h1>
+    </div>
+    <div class="container">
+        <div class="vertical-text">
+            Modificar Datos del Paciente
+        </div>
+        <form id="searchForm">
+            <label for="searchDni">Ingrese el DNI del Paciente:</label>
+            <input type="number" id="searchDni" name="searchDni" maxlength="8" required>
+            <div class="form-buttons">
+                <button type="submit">Buscar Paciente</button>
+                <button type="button" class="back-button" onclick="window.location.href='{{ url_for('secretaria_dashboard') }}'">Volver Atrás</button>
+            </div>
+        </form>
+        <form id="patientForm" style="display:none;">
+            <label for="patientName">Apellido y Nombre:</label>
+            <input type="text" id="patientName" name="patientName" maxlength="50" required>
+
+            <label for="dni">DNI:</label>
+            <input type="number" id="dni" name="dni" maxlength="8" required disabled>
+
+            <label for="birthdate">Fecha de Nacimiento:</label>
+            <input type="date" id="birthdate" name="birthdate" required>
+
+            <label for="socialSecurity">Obra Social:</label>
+            <input type="text" id="socialSecurity" name="socialSecurity" maxlength="50">
+
+            <label for="phone">Teléfono:</label>
+            <input type="text" id="phone" name="phone" maxlength="20">
+
+            <label for="email">Mail:</label>
+            <input type="email" id="email" name="email" maxlength="50">
+
+            <label for="address">Dirección:</label>
+            <input type="text" id="address" name="address" maxlength="80">
+
+            <button type="submit">Guardar Datos</button>
+            <button type="reset">Cancelar</button>
+        </form>
+    </div>
+
+    <script>
+
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+    event.preventDefault();  // Prevenir comportamiento predeterminado del formulario
+    const dni = document.getElementById('searchDni').value;
+    fetch(`/get_paciente?dni=${dni}`)  // Realizar solicitud GET al endpoint /get_paciente con el DNI ingresado
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                // Si se encuentra el paciente, mostrar el formulario con los datos rellenados
+                document.getElementById('patientForm').style.display = 'block';
+                document.getElementById('patientName').value = data.nombre;
+                document.getElementById('dni').value = data.dni;
+                document.getElementById('birthdate').value = data.fecha_nacimiento;
+                document.getElementById('socialSecurity').value = data.obra_social;
+                document.getElementById('phone').value = data.telefono;
+                document.getElementById('email').value = data.email;
+                document.getElementById('address').value = data.direccion;
+                document.getElementById('patientName').focus();
+            } else {
+                alert('Paciente no encontrado');
+            }
+        })
+        .catch(error => console.error('Error fetching paciente:', error));
+});
+
+
+        document.getElementById('patientForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/update_paciente', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Datos actualizados correctamente');
+                    } else {
+                        alert('Error actualizando datos');
+                    }
+                })
+                .catch(error => console.error('Error updating paciente:', error));
+        });
+    </script>
+</body>
+</html>

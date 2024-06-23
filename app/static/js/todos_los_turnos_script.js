@@ -23,6 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
             pacienteCell.textContent = turno.dni;
             row.appendChild(pacienteCell);
 
+            const nombreCell = document.createElement('td');
+            nombreCell.textContent = turno.nombre;
+            nombreCell.classList.add('nowrap');  // Añadir la clase nowrap aquí
+            row.appendChild(nombreCell);
+
             const estadoCell = document.createElement('td');
             if(turno.estado == 1 && new Date(turno.fecha) < new Date()){
                 estadoCell.textContent = "Vencido";

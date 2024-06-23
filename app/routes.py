@@ -196,6 +196,11 @@ def secretaria_dashboard():
 def cliente_dashboard():
     return render_template('cliente_dashboard.html')
 
+@app.route('/modifpacientes')
+@login_required
+def modifpacientes():
+    return render_template('modifpacientes.html')
+
 @app.route('/altaturno')
 @login_required
 def altaturno():
