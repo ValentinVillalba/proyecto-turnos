@@ -6,7 +6,7 @@ from app import app, db
 
 app.secret_key = 'supersecretkey'  # Necesario para usar flash messages
 
-# Serializar los datos de la base de datos
+#Serializar los datos de la base de datos
 def serialize_data(rows):
     for row in rows:
         for key, value in row.items():
@@ -35,13 +35,14 @@ def role_required(role):
         return decorated_function
     return decorator
 
-# RUTAS
+#RUTAS
 
-# Ruta para obtener todos los datos de la tabla turnos para la secretaria
+# Ruta para obtener todos los datos de la tabla turnos en el front-end
 @app.route('/get_data_turnos')
-@login_required
-@role_required('secretaria')
-def get_data_turnos_secretaria():
+@login_required #Recordar agregar este decorador siempre a todas las rutas, excepto login y logout
+@role_required('secretaria') #Recordar agregar este decorador a las rutas que son SOLO para secretaria
+#@role_required('facturista') #Recordar agragar este decorador a las rutas que son SOLO para facturista 
+def get_data():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
@@ -53,11 +54,11 @@ def get_data_turnos_secretaria():
     else:
         return jsonify([])
 
-# Ruta para obtener todos los datos de la tabla turnos para el facturista
-@app.route('/get_data_turnos_facturista')
-@login_required
-@role_required('facturista')
-def get_data_turnos_facturista():
+# Ruta para obtener todos los datos de la tabla turnos en el front-end
+@app.route('/get_data_turnos_f')
+@login_required #Recordar agregar este decorador siempre a todas las rutas, excepto login y logout
+@role_required('facturista') #Recordar agragar este decorador a las rutas que son SOLO para facturista 
+def get_data():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
@@ -73,7 +74,7 @@ def get_data_turnos_facturista():
 @app.route('/get_turnos_usuario')
 @login_required
 @role_required('cliente')
-def get_turnos_usuario():
+def get_data_usuario():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
@@ -85,7 +86,7 @@ def get_turnos_usuario():
         return jsonify(rows)
     else:
         return jsonify([])
-
+    
 # Ruta para ver turnos pendientes del usuario unicamente
 @app.route('/get_turnos_pendientes')
 @login_required
@@ -102,7 +103,7 @@ def get_turnos_pendientes():
         return jsonify(rows)
     else:
         return jsonify([])
-
+    
 # Ruta para ver todos los turnos pendientes
 @app.route('/get_all_turnos_pendientes')
 @login_required
@@ -119,7 +120,7 @@ def get_all_turnos_pendientes():
         return jsonify(rows)
     else:
         return jsonify([])
-
+    
 # Ruta para cancelar turnos
 @app.route('/cancelar_turno', methods=['POST'])
 @login_required
@@ -189,14 +190,14 @@ def login_post():
                 return redirect(url_for('secretaria_dashboard'))
             elif user['rol'] == 'cliente':
                 return redirect(url_for('cliente_dashboard'))
-            elif user['rol'] == 'facturista':
+            elif user['rol'] == 'facturista':    # si ingreso con rol facturista obras sociales
                 return redirect(url_for('facturista_dashboard'))
         else:
             flash('Usuario o contraseña incorrecta, ingrese los datos nuevamente')
             return redirect(url_for('login'))
     else:
         return jsonify([])
-
+    
 @app.route('/logout')
 def logout():
     session.pop('username', None)
@@ -236,6 +237,7 @@ def altaturno():
 def mis_turnos():
     return render_template('mis_turnos.html')
 
+
 @app.route('/cancelar_turnos')
 @login_required
 @role_required('cliente')
@@ -265,20 +267,27 @@ def f_todos_los_turnos():
 @role_required('secretaria')
 def add_patient():
     data = request.json
+    nombre = data.get('newPatientName')
+    dni = data.get('newDni')
+    fecha_nac = datetime.strptime(data.get('newBirthdate'), '%Y-%m-%d').date()
+    obra_soc = data.get('newObraSocial').lower()
+    telefono = data.get('newPhone')
+    email = data.get('newEmail')
+    direccion = data.get('newAddress')
+    
     nuevo_paciente = Pacientes(
-        dni=data['dni'],
-        obra_soc=data['obra_soc'],
-        nombre_apellido=data['nombre_apellido'],
-        sexo=data['sexo'],
-        fecha_nac=data['fecha_nac'],
-        estado=data['estado'],
-        direccion=data['direccion'],
-        telefono=data['telefono'],
-        email=data['email']
+        nombre=nombre,
+        dni=dni,
+        fecha_nac=fecha_nac,
+        obra_soc=obra_soc,
+        telefono=telefono,
+        email=email,
+        direccion=direccion
     )
+    
     db.session.add(nuevo_paciente)
     db.session.commit()
-
+    
     return jsonify({'message': 'Paciente agregado correctamente'})
 
 @app.route('/get_pacientes')
@@ -296,7 +305,7 @@ def get_pacientes():
         return jsonify(rows)
     else:
         return jsonify([])
-
+    
 @app.route('/asignar_turno', methods=['POST'])
 @login_required
 @role_required('secretaria')
@@ -308,7 +317,7 @@ def asignar_turno():
             dni = request.json['dni']
             fecha = request.json['appointmentDate']
             hora = request.json['appointmentTime']
-
+            
             cursor.execute("SELECT id_paciente FROM pacientes WHERE dni = %s", (dni,))
             result = cursor.fetchone()
             if result is None:
