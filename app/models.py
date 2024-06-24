@@ -54,6 +54,5 @@ class Usuarios(db.Model):
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre_usuario = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(20), nullable=False)
-    #rol = db.Column(db.Enum('facturista'), nullable=False)
-    rol = db.Column(db.Enum('secretaria', 'cliente'), nullable=False)
+    rol = db.Column(db.Enum('secretaria', 'cliente', 'facturista'), nullable=False)
     obra_soc = db.Column(db.String(30), nullable=True)
