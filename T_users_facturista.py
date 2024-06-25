@@ -9,7 +9,7 @@ def insert_user_facturista():
             print("Ya existe un usuario con el rol de facturista.")
         else:
             # Crear un nuevo usuario con rol 'facturista'
-            new_user = Usuarios(nombre_usuario='facturista', password='factu123', rol='facturista')
+            new_user = Usuarios(nombre_usuario='facturista', password='factu123', rol='facturista', obra_soc='OSDE')
             db.session.add(new_user)
             db.session.commit()
             print("Usuario facturista insertado correctamente.")
