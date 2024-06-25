@@ -16,10 +16,10 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin: 0;
-            padding: 0 ;
+            padding: 0;
             display: flex;
-            justify-content:space-between;
-            align-items: flex-start; /* Cambiado de center a flex-start */
+            justify-content: center;
+            align-items: flex-start;
             height: 100vh;
             flex-direction: column;
         }
@@ -38,27 +38,29 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 800px; /* Ajustado de 400px a 600px */
-            margin-top: 100px; /* Ajusta según sea necesario */
+            max-width: 800px;
+            margin-top: 100px;
+        }
+        .form-container {
+            margin-bottom: 20px;
         }
         label {
             display: block;
             margin-bottom: 8px;
             color: #555;
         }
-        input[type="text"], input[type="password"] {
+        input[type="date"], button {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
+            color: #000; /* Color del texto en los campos de entrada */
+            background-color: #fff; /* Color de fondo en los campos de entrada */
         }
         button {
-            width: 100%;
-            padding: 10px;
             border: none;
-            border-radius: 4px;
             color: #fff;
             background-color: #28a745;
             cursor: pointer;
@@ -66,20 +68,12 @@
         button:hover {
             opacity: 0.9;
         }
-        .alert {
-            display: none;
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-        }
-        .black-text {
-            color: #000000 !important;
+        .btn-secondary {
+            background-color: #6c757d;
         }
         .table-container {
-            margin-top: 20px; /* Ajusta según sea necesario */
+            display: none; /* Ocultamos la tabla inicialmente */
         }
-        /* Estilo para que no haga salto de línea */
         .nowrap {
             white-space: nowrap;
         }
@@ -90,8 +84,16 @@
         <h1>Consultorio del Dr. Amado</h1>
     </div>
     <div class="container">
-        <h2 class="black-text">Consultar todos los turnos</h2>
+        <div class="form-container">
+            <label for="fecha-desde">Fecha Desde</label>
+            <input type="date" id="fecha-desde">
+            <label for="fecha-hasta">Fecha Hasta</label>
+            <input type="date" id="fecha-hasta">
+            <button id="consultar-btn" onclick="consultarTurnos()">Consultar</button>
+            <button id="volver-btn" class="btn btn-secondary" onclick="window.location.href='{{ url_for('facturista_dashboard') }}'">Volver</button>
+        </div>
         <div class="table-container">
+            <h2 class="black-text">Consultar todos los turnos</h2>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -108,7 +110,6 @@
                 </tbody>
             </table>
         </div>
-        <a style="margin: 4.6px;" class="btn btn-secondary" href="{{ url_for('facturista_dashboard') }}">Volver atrás</a>
     </div>
 </body>
 </html>
