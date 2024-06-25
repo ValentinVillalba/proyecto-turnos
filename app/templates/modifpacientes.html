@@ -106,7 +106,9 @@
             </div>
         </form>
         <form id="patientForm" style="display:none;">
-            <label for="patientName">Apellido y Nombre:</label>
+            <input type="hidden" id="id_paciente" name="id_paciente">
+
+            <label for="patientName">Nombre:</label>
             <input type="text" id="patientName" name="patientName" maxlength="50" required>
 
             <label for="dni">DNI:</label>
@@ -133,31 +135,30 @@
     </div>
 
     <script>
-
-    document.getElementById('searchForm').addEventListener('submit', function(event) {
-    event.preventDefault();  // Prevenir comportamiento predeterminado del formulario
-    const dni = document.getElementById('searchDni').value;
-    fetch(`/get_paciente?dni=${dni}`)  // Realizar solicitud GET al endpoint /get_paciente con el DNI ingresado
-        .then(response => response.json())
-        .then(data => {
-            if (data) {
-                // Si se encuentra el paciente, mostrar el formulario con los datos rellenados
-                document.getElementById('patientForm').style.display = 'block';
-                document.getElementById('patientName').value = data.nombre;
-                document.getElementById('dni').value = data.dni;
-                document.getElementById('birthdate').value = data.fecha_nacimiento;
-                document.getElementById('socialSecurity').value = data.obra_social;
-                document.getElementById('phone').value = data.telefono;
-                document.getElementById('email').value = data.email;
-                document.getElementById('address').value = data.direccion;
-                document.getElementById('patientName').focus();
-            } else {
-                alert('Paciente no encontrado');
-            }
-        })
-        .catch(error => console.error('Error fetching paciente:', error));
-});
-
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevenir comportamiento predeterminado del formulario
+            const dni = document.getElementById('searchDni').value;
+            fetch(`/get_paciente?dni=${dni}`)  // Realizar solicitud GET al endpoint /get_paciente con el DNI ingresado
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        // Si se encuentra el paciente, mostrar el formulario con los datos rellenados
+                        document.getElementById('patientForm').style.display = 'block';
+                        document.getElementById('id_paciente').value = data.id_paciente;
+                        document.getElementById('patientName').value = data.nombre;
+                        document.getElementById('dni').value = data.dni;
+                        document.getElementById('birthdate').value = data.fecha_nac;
+                        document.getElementById('socialSecurity').value = data.obra_soc;
+                        document.getElementById('phone').value = data.telefono;
+                        document.getElementById('email').value = data.email;
+                        document.getElementById('address').value = data.direccion;
+                        document.getElementById('patientName').focus();
+                    } else {
+                        alert('Paciente no encontrado');
+                    }
+                })
+                .catch(error => console.error('Error fetching paciente:', error));
+        });
 
         document.getElementById('patientForm').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -170,11 +171,24 @@
                 .then(data => {
                     if (data.success) {
                         alert('Datos actualizados correctamente');
+                        document.getElementById('patientForm').style.display = 'none';
+                        document.getElementById('searchDni').value = '';
+                        document.getElementById('searchDni').focus();
                     } else {
-                        alert('Error actualizando datos');
+                        alert(`Error actualizando datos: ${data.error}`);
                     }
                 })
                 .catch(error => console.error('Error updating paciente:', error));
+        });
+
+        document.getElementById('patientName').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();  // Convertir el valor a mayúsculas
+        });
+
+        document.querySelector('button[type="reset"]').addEventListener('click', function() {
+            document.getElementById('patientForm').style.display = 'none';  // Ocultar el formulario de paciente
+            document.getElementById('searchDni').value = '';  // Limpiar el campo de búsqueda de DNI
+            document.getElementById('searchDni').focus();  // Volver el foco al campo de búsqueda de DNI
         });
     </script>
 </body>

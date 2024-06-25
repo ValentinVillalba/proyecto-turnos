@@ -326,3 +326,51 @@ def asignar_turno():
             return jsonify({'message': 'Error al asignar el turno'})
     else:
         return jsonify({'message': 'Error al conectar a la base de datos'})
+
+# Ruta para obtener datos del paciente
+@app.route('/get_paciente', methods=['GET'])
+@login_required
+@role_required('secretaria')
+def get_paciente():
+    dni = request.args.get('dni')
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        query = "SELECT * FROM pacientes WHERE dni = %s"
+        cursor.execute(query, (dni,))
+        paciente = cursor.fetchone()
+        close_connection(connection)
+        if paciente:
+            paciente = serialize_data([paciente])[0]
+            return jsonify(paciente)
+        else:
+            return jsonify(None)
+    else:
+        return jsonify({'message': 'Error al conectar a la base de datos'}), 500
+
+
+#Ruta para actualizar datos del paciente
+@app.route('/update_paciente', methods=['POST'])
+@login_required
+@role_required('secretaria')
+def update_paciente():
+    data = request.form
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor()
+        try:
+            query = """
+                UPDATE pacientes 
+                SET nombre=%s, fecha_nac=%s, obra_soc=%s, telefono=%s, email=%s, direccion=%s 
+                WHERE id_paciente=%s
+            """
+            cursor.execute(query, (data['patientName'], data['birthdate'], data['socialSecurity'], data['phone'], data['email'], data['address'], data['id_paciente']))
+            connection.commit()
+            close_connection(connection)
+            return jsonify({'success': True})
+        except Exception as e:
+            print(f"Error: {e}")
+            close_connection(connection)
+            return jsonify({'success': False, 'error': str(e)})
+    else:
+        return jsonify({'message': 'Error al conectar a la base de datos'}), 500
