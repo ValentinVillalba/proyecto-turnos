@@ -81,7 +81,7 @@
             opacity: 0.9;
         }
         .back-button {
-            background-color: #007bff;
+            background-color: #6c757d;
         }
         .form-buttons {
             display: flex;
@@ -101,8 +101,8 @@
             <label for="searchDni">Ingrese el DNI del Paciente:</label>
             <input type="number" id="searchDni" name="searchDni" maxlength="8" required>
             <div class="form-buttons">
-                <button type="submit">Buscar Paciente</button>
                 <button type="button" class="back-button" onclick="window.location.href='{{ url_for('secretaria_dashboard') }}'">Volver Atrás</button>
+                <button type="submit">Buscar Paciente</button>
             </div>
         </form>
         <form id="patientForm" style="display:none;">

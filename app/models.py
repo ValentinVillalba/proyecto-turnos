@@ -47,6 +47,7 @@ class Turnos(db.Model):
     fecha = db.Column(db.Date, nullable=False)
     hora = db.Column(db.Time, nullable=False)
     estado = db.Column(db.Boolean, nullable=False)
+    asistencia = db.Column(db.Boolean, nullable=False, default=False) #Por defecto se asume que el paciente no asistió
     id_paciente = db.Column(db.Integer, db.ForeignKey('pacientes.id_paciente'), nullable=False)
 
 class Usuarios(db.Model):
