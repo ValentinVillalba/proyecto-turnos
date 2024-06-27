@@ -29,12 +29,22 @@ document.addEventListener('DOMContentLoaded', () => {
             row.appendChild(nombreCell);
 
             const estadoCell = document.createElement('td');
-            if(turno.estado == 1 && new Date(turno.fecha) < new Date()){
+
+            
+            
+            if (turno.estado == 1 && new Date(turno.fecha) < new Date() && turno.asistencia == 0) {
                 estadoCell.textContent = "Vencido";
             }
-            else{
-                estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
+            else if (turno.asistencia == 1) {
+                estadoCell.textContent = "Asistió";
             }
+            else if (turno.estado == 1) {
+                estadoCell.textContent = "Pendiente";
+            }
+            else if (turno.estado == 0) {
+                estadoCell.textContent = "Cancelado";
+            }
+
             row.appendChild(estadoCell);
 
             tbody.appendChild(row);

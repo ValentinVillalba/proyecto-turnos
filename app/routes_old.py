@@ -1,4 +1,4 @@
-from datetime import date, time, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from functools import wraps
 from flask import jsonify, render_template, request, redirect, url_for, flash, session
 from app.models import Pacientes, create_connection, close_connection
@@ -6,7 +6,7 @@ from app import app, db
 
 app.secret_key = 'supersecretkey'  # Necesario para usar flash messages
 
-# Serializar los datos de la base de datos
+#Serializar los datos de la base de datos
 def serialize_data(rows):
     for row in rows:
         for key, value in row.items():
@@ -35,13 +35,14 @@ def role_required(role):
         return decorated_function
     return decorator
 
-# RUTAS
+#RUTAS
 
-# Ruta para obtener todos los datos de la tabla turnos para la secretaria
+# Ruta para obtener todos los datos de la tabla turnos en el front-end
 @app.route('/get_data_turnos')
-@login_required
-@role_required('secretaria')
-def get_data_turnos_secretaria():
+@login_required #Recordar agregar este decorador siempre a todas las rutas, excepto login y logout
+@role_required('secretaria') #Recordar agregar este decorador a las rutas que son SOLO para secretaria
+#@role_required('facturista') #Recordar agragar este decorador a las rutas que son SOLO para facturista 
+def get_data():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
@@ -53,12 +54,27 @@ def get_data_turnos_secretaria():
     else:
         return jsonify([])
 
+# Ruta para obtener todos los datos de la tabla turnos en el front-end
+@app.route('/get_data_turnos_f')
+@login_required #Recordar agregar este decorador siempre a todas las rutas, excepto login y logout
+@role_required('facturista') #Recordar agragar este decorador a las rutas que son SOLO para facturista 
+def get_data():
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM turnos JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente")
+        rows = cursor.fetchall()
+        close_connection(connection)
+        rows = serialize_data(rows)
+        return jsonify(rows)
+    else:
+        return jsonify([])
 
 # Ruta para obtener los turnos del usuario logueado
 @app.route('/get_turnos_usuario')
 @login_required
 @role_required('cliente')
-def get_turnos_usuario():
+def get_data_usuario():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
@@ -70,7 +86,7 @@ def get_turnos_usuario():
         return jsonify(rows)
     else:
         return jsonify([])
-
+    
 # Ruta para ver turnos pendientes del usuario unicamente
 @app.route('/get_turnos_pendientes')
 @login_required
@@ -87,7 +103,7 @@ def get_turnos_pendientes():
         return jsonify(rows)
     else:
         return jsonify([])
-
+    
 # Ruta para ver todos los turnos pendientes
 @app.route('/get_all_turnos_pendientes')
 @login_required
@@ -96,7 +112,7 @@ def get_all_turnos_pendientes():
     connection = create_connection()
     if connection:
         cursor = connection.cursor(dictionary=True)
-        query = "SELECT * FROM turnos WHERE estado = 1 AND asistencia=0 AND fecha >= CURDATE() ORDER BY fecha ASC"
+        query = "SELECT * FROM turnos WHERE estado = 1"
         cursor.execute(query)
         rows = cursor.fetchall()
         close_connection(connection)
@@ -104,7 +120,7 @@ def get_all_turnos_pendientes():
         return jsonify(rows)
     else:
         return jsonify([])
-
+    
 # Ruta para cancelar turnos
 @app.route('/cancelar_turno', methods=['POST'])
 @login_required
@@ -174,14 +190,14 @@ def login_post():
                 return redirect(url_for('secretaria_dashboard'))
             elif user['rol'] == 'cliente':
                 return redirect(url_for('cliente_dashboard'))
-            elif user['rol'] == 'facturista':
+            elif user['rol'] == 'facturista':    # si ingreso con rol facturista obras sociales
                 return redirect(url_for('facturista_dashboard'))
         else:
             flash('Usuario o contraseña incorrecta, ingrese los datos nuevamente')
             return redirect(url_for('login'))
     else:
         return jsonify([])
-
+    
 @app.route('/logout')
 def logout():
     session.pop('username', None)
@@ -221,11 +237,6 @@ def altaturno():
 def mis_turnos():
     return render_template('mis_turnos.html')
 
-@app.route('/asistencia')
-@login_required
-@role_required('secretaria')
-def asistencia():
-    return render_template('asistencia.html')
 
 @app.route('/cancelar_turnos')
 @login_required
@@ -294,7 +305,7 @@ def get_pacientes():
         return jsonify(rows)
     else:
         return jsonify([])
-
+    
 @app.route('/asignar_turno', methods=['POST'])
 @login_required
 @role_required('secretaria')
@@ -314,7 +325,7 @@ def asignar_turno():
 
             id_paciente = result['id_paciente']
 
-            query = "INSERT INTO turnos (fecha, hora, estado, asistencia, id_paciente) VALUES (%s, %s, 1, 0, %s)"
+            query = "INSERT INTO turnos (fecha, hora, estado, id_paciente) VALUES (%s, %s, 1, %s)"
             cursor.execute(query, (fecha, hora, id_paciente))
             connection.commit()
             close_connection(connection)
@@ -324,164 +335,3 @@ def asignar_turno():
             return jsonify({'message': 'Error al asignar el turno'})
     else:
         return jsonify({'message': 'Error al conectar a la base de datos'})
-
-# Ruta para obtener datos del paciente
-@app.route('/get_paciente', methods=['GET'])
-@login_required
-@role_required('secretaria')
-def get_paciente():
-    dni = request.args.get('dni')
-    connection = create_connection()
-    if connection:
-        cursor = connection.cursor(dictionary=True)
-        query = "SELECT * FROM pacientes WHERE dni = %s"
-        cursor.execute(query, (dni,))
-        paciente = cursor.fetchone()
-        close_connection(connection)
-        if paciente:
-            paciente = serialize_data([paciente])[0]
-            return jsonify(paciente)
-        else:
-            return jsonify(None)
-    else:
-        return jsonify({'message': 'Error al conectar a la base de datos'}), 500
-
-
-#Ruta para actualizar datos del paciente
-@app.route('/update_paciente', methods=['POST'])
-@login_required
-@role_required('secretaria')
-def update_paciente():
-    data = request.form
-    connection = create_connection()
-    if connection:
-        cursor = connection.cursor()
-        try:
-            query = """
-                UPDATE pacientes 
-                SET nombre=%s, fecha_nac=%s, obra_soc=%s, telefono=%s, email=%s, direccion=%s 
-                WHERE id_paciente=%s
-            """
-            cursor.execute(query, (data['patientName'], data['birthdate'], data['socialSecurity'], data['phone'], data['email'], data['address'], data['id_paciente']))
-            connection.commit()
-            close_connection(connection)
-            return jsonify({'success': True})
-        except Exception as e:
-            print(f"Error: {e}")
-            close_connection(connection)
-            return jsonify({'success': False, 'error': str(e)})
-    else:
-        return jsonify({'message': 'Error al conectar a la base de datos'}), 500
-
-
-# Ruta para obtener todos los datos de la tabla turnos para el facturista con filtros opcionales
-@app.route('/get_data_turnos_facturista')
-@login_required
-@role_required('facturista')
-def get_data_turnos_facturista():
-    obra_social = request.args.get('obraSocial')
-    fecha_desde = request.args.get('fechaDesde')
-    fecha_hasta = request.args.get('fechaHasta')
-
-    connection = create_connection()
-    if connection:
-        cursor = connection.cursor(dictionary=True)
-        query = """
-            SELECT turnos.*, pacientes.*
-            FROM turnos
-            JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente
-            WHERE 1=1
-        """
-
-        params = []
-        if obra_social:
-            query += " AND pacientes.obra_soc = %s"
-            params.append(obra_social)
-        if fecha_desde:
-            query += " AND turnos.fecha >= %s"
-            params.append(fecha_desde)
-        if fecha_hasta:
-            query += " AND turnos.fecha <= %s"
-            params.append(fecha_hasta)
-
-        query += " ORDER BY turnos.fecha ASC"
-
-        cursor.execute(query, params)
-        rows = cursor.fetchall()
-        close_connection(connection)
-        rows = serialize_data(rows)
-        return jsonify(rows)
-    else:
-        return jsonify([])
-# Ruta vieja para obtener todos los datos de la tabla turnos para el facturista
-#@app.route('/get_data_turnos_facturista')
-#@login_required
-#@role_required('facturista')
-#def get_data_turnos_facturista():
-#    connection = create_connection()
-#    if connection:
-#        cursor = connection.cursor(dictionary=True)
-#        cursor.execute("SELECT * FROM turnos JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente")
-#        rows = cursor.fetchall()
-#        close_connection(connection)
-#        rows = serialize_data(rows)
-#        return jsonify(rows)
-#    else:
-#        return jsonify([])
-
-@app.route('/get_turnos_by_dni', methods=['GET'])
-@login_required
-@role_required('secretaria')
-def get_turnos_by_dni():
-    dni = request.args.get('dni')
-    if not dni:
-        return jsonify({'error': 'DNI es requerido'}), 400
-
-    connection = create_connection()
-    if connection:
-        cursor = connection.cursor(dictionary=True)
-        try:
-            query = """
-                SELECT t.id_turno, t.fecha, t.hora, t.estado, t.asistencia, p.dni
-                FROM turnos t
-                JOIN pacientes p ON t.id_paciente = p.id_paciente
-                WHERE p.dni = %s
-            """
-            cursor.execute(query, (dni,))
-            rows = cursor.fetchall()
-            close_connection(connection)
-            
-            if rows:
-                rows = serialize_data(rows)
-                return jsonify({'turnos': rows}), 200
-            else:
-                return jsonify({'error': 'No se encontraron turnos para este paciente'}), 404
-        except Exception as e:
-            print(f"Error: {e}")
-            return jsonify({'error': 'Error al obtener los turnos'}), 500
-    else:
-        return jsonify({'error': 'Error al conectar a la base de datos'}), 500
-
-@app.route('/update_asistencia', methods=['POST'])
-@login_required
-@role_required('secretaria')
-def update_asistencia():
-    data = request.get_json()
-    id_turno = data.get('id_turno')
-    if not id_turno:
-        return jsonify({'error': 'ID del turno es requerido'}), 400
-
-    connection = create_connection()
-    if connection:
-        cursor = connection.cursor()
-        try:
-            query = "UPDATE turnos SET asistencia = %s WHERE id_turno = %s"
-            cursor.execute(query, (True, id_turno))
-            connection.commit()
-            close_connection(connection)
-            return jsonify({'message': 'Asistencia actualizada correctamente'}), 200
-        except Exception as e:
-            print(f"Error: {e}")
-            return jsonify({'error': 'Error al actualizar la asistencia'}), 500
-    else:
-        return jsonify({'error': 'Error al conectar a la base de datos'}), 500
