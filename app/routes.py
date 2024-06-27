@@ -221,6 +221,12 @@ def altaturno():
 def mis_turnos():
     return render_template('mis_turnos.html')
 
+@app.route('/asistencia')
+@login_required
+@role_required('secretaria')
+def asistencia():
+    return render_template('asistencia.html')
+
 @app.route('/cancelar_turnos')
 @login_required
 @role_required('cliente')
