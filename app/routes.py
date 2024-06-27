@@ -53,21 +53,6 @@ def get_data_turnos_secretaria():
     else:
         return jsonify([])
 
-# Ruta para obtener todos los datos de la tabla turnos para el facturista
-@app.route('/get_data_turnos_facturista')
-@login_required
-@role_required('facturista')
-def get_data_turnos_facturista():
-    connection = create_connection()
-    if connection:
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM turnos JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente")
-        rows = cursor.fetchall()
-        close_connection(connection)
-        rows = serialize_data(rows)
-        return jsonify(rows)
-    else:
-        return jsonify([])
 
 # Ruta para obtener los turnos del usuario logueado
 @app.route('/get_turnos_usuario')
@@ -374,3 +359,59 @@ def update_paciente():
             return jsonify({'success': False, 'error': str(e)})
     else:
         return jsonify({'message': 'Error al conectar a la base de datos'}), 500
+
+
+# Ruta para obtener todos los datos de la tabla turnos para el facturista con filtros opcionales
+@app.route('/get_data_turnos_facturista')
+@login_required
+@role_required('facturista')
+def get_data_turnos_facturista():
+    obra_social = request.args.get('obraSocial')
+    fecha_desde = request.args.get('fechaDesde')
+    fecha_hasta = request.args.get('fechaHasta')
+
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        query = """
+            SELECT turnos.*, pacientes.*
+            FROM turnos
+            JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente
+            WHERE 1=1
+        """
+
+        params = []
+        if obra_social:
+            query += " AND pacientes.obra_soc = %s"
+            params.append(obra_social)
+        if fecha_desde:
+            query += " AND turnos.fecha >= %s"
+            params.append(fecha_desde)
+        if fecha_hasta:
+            query += " AND turnos.fecha <= %s"
+            params.append(fecha_hasta)
+
+        query += " ORDER BY turnos.fecha ASC"
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        close_connection(connection)
+        rows = serialize_data(rows)
+        return jsonify(rows)
+    else:
+        return jsonify([])
+# Ruta vieja para obtener todos los datos de la tabla turnos para el facturista
+#@app.route('/get_data_turnos_facturista')
+#@login_required
+#@role_required('facturista')
+#def get_data_turnos_facturista():
+#    connection = create_connection()
+#    if connection:
+#        cursor = connection.cursor(dictionary=True)
+#        cursor.execute("SELECT * FROM turnos JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente")
+#        rows = cursor.fetchall()
+#        close_connection(connection)
+#        rows = serialize_data(rows)
+#        return jsonify(rows)
+#    else:
+#        return jsonify([])

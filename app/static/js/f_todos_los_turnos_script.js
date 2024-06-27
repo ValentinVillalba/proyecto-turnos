@@ -74,3 +74,4 @@ function consultarTurnos() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM cargado'); // Verificar que el DOM está cargado
 });
+
