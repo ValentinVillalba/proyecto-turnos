@@ -16,9 +16,9 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin: 0;
-            padding: 0 ;
+            padding: 0;
             display: flex;
-            justify-content:space-between;
+            justify-content: space-between;
             align-items: flex-start; /* Cambiado de center a flex-start */
             height: 100vh;
             flex-direction: column;
@@ -46,7 +46,7 @@
             margin-bottom: 8px;
             color: #555;
         }
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="password"], input[type="date"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
@@ -91,6 +91,18 @@
     </div>
     <div class="container">
         <h2 class="black-text">Consultar todos los turnos</h2>
+        <form id="filterForm">
+            <label for="obraSocial">Obra Social:</label>
+            <input type="text" id="obraSocial" name="obraSocial">
+
+            <label for="fechaDesde">Fecha Desde:</label>
+            <input type="date" id="fechaDesde" name="fechaDesde">
+
+            <label for="fechaHasta">Fecha Hasta:</label>
+            <input type="date" id="fechaHasta" name="fechaHasta">
+
+            <button type="submit">Consultar</button>
+        </form>
         <div class="table-container">
             <table class="table table-striped">
                 <thead>
