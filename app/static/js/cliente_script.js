@@ -35,12 +35,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.appendChild(obrasocialCell);
 
                 const estadoCell = document.createElement('td');
-                if(turno.estado == 1 && new Date(turno.fecha) < new Date()){
+
+                let fechaTurnoDate = new Date(turno.fecha + 'T00:00:00-03:00');
+
+                let partesHora = turno.hora.split(':');
+                let hora = parseInt(partesHora[0], 10);
+                let minutos = parseInt(partesHora[1], 10);
+
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+
+                const esHoy = fechaTurnoDate.getTime() === hoy.getTime();
+
+                if (turno.asistencia == 1) {
+                    estadoCell.textContent = "Asistió";
+                } 
+                else if (fechaTurnoDate < hoy) {
                     estadoCell.textContent = "Vencido";
-                }
-                else{
+                } 
+                else if (esHoy) {
+                    const ahora = new Date();
+                    if (turno.estado == 1 && (hora < ahora.getHours() || (hora === ahora.getHours() && minutos < ahora.getMinutes()))) {
+                        estadoCell.textContent = "Vencido";
+                    }
+                    else {
+                        estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
+                    }
+                } 
+                else {
                     estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
                 }
+
                 row.appendChild(estadoCell);
 
                 tbody.appendChild(row);

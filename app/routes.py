@@ -125,25 +125,25 @@ def cancelar_turno():
     else:
         return jsonify({'message': 'Error al conectar a la base de datos'})
 
-# Ruta para cancelar los turnos vencidos
-@app.route('/cancelar_turnos_vencidos', methods=['POST'])
-@login_required
-@role_required('secretaria')
-def cancelar_turnos_vencidos():
-    connection = create_connection()
-    if connection:
-        cursor = connection.cursor(dictionary=True)
-        try:
-            query = "UPDATE turnos SET estado = 0 WHERE fecha < CURDATE() AND estado = 1"
-            cursor.execute(query)
-            connection.commit()
-            close_connection(connection)
-            return jsonify({'message': 'Turnos vencidos cancelados correctamente'})
-        except Exception as e:
-            print(f"Error: {e}")
-            return jsonify({'message': 'Error al cancelar los turnos vencidos'})
-    else:
-        return jsonify({'message': 'Error al conectar a la base de datos'})
+# # Ruta para cancelar los turnos vencidos
+# @app.route('/cancelar_turnos_vencidos', methods=['POST'])
+# @login_required
+# @role_required('secretaria')
+# def cancelar_turnos_vencidos():
+#     connection = create_connection()
+#     if connection:
+#         cursor = connection.cursor(dictionary=True)
+#         try:
+#             query = "UPDATE turnos SET estado = 0 WHERE fecha < CURDATE()"
+#             cursor.execute(query)
+#             connection.commit()
+#             close_connection(connection)
+#             return jsonify({'message': 'Turnos vencidos cancelados correctamente'})
+#         except Exception as e:
+#             print(f"Error: {e}")
+#             return jsonify({'message': 'Error al cancelar los turnos vencidos'})
+#     else:
+#         return jsonify({'message': 'Error al conectar a la base de datos'})
 
 # Index login
 @app.route('/')
@@ -226,12 +226,6 @@ def mis_turnos():
 @role_required('secretaria')
 def asistencia():
     return render_template('asistencia.html')
-
-@app.route('/cancelar_turnos')
-@login_required
-@role_required('cliente')
-def cancelar_turnos():
-    return render_template('cancelar_turno.html')
 
 @app.route('/cancelar_turnos_admin')
 @login_required
@@ -475,8 +469,8 @@ def update_asistencia():
     if connection:
         cursor = connection.cursor()
         try:
-            query = "UPDATE turnos SET asistencia = %s WHERE id_turno = %s"
-            cursor.execute(query, (True, id_turno))
+            query = "UPDATE turnos SET asistencia = %s, estado = %s WHERE id_turno = %s"
+            cursor.execute(query, (True, True, id_turno))
             connection.commit()
             close_connection(connection)
             return jsonify({'message': 'Asistencia actualizada correctamente'}), 200
@@ -495,7 +489,7 @@ def get_turnos_dia_cliente():
         cursor = connection.cursor(dictionary=True)
         try:
             query = """
-                SELECT turnos.fecha, turnos.hora, pacientes.dni, pacientes.nombre, pacientes.obra_soc, turnos.estado
+                SELECT turnos.fecha, turnos.hora, pacientes.dni, pacientes.nombre, pacientes.obra_soc, turnos.estado, turnos.asistencia
                 FROM turnos
                 JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente
                 WHERE turnos.fecha = %s

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('boton-vencidos').setAttribute('disabled', 'disabled');
+    // document.getElementById('boton-vencidos').setAttribute('disabled', 'disabled');
 
     fetch('/get_all_turnos_pendientes')
         .then(response => response.json())
@@ -22,12 +22,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.appendChild(horaCell);
 
                 const estadoCell = document.createElement('td');
-                if(turno.estado == 1 && new Date(turno.fecha) < new Date()){
+                
+                let fechaTurnoDate = new Date(turno.fecha + 'T00:00:00-03:00');
+
+            let partesHora = turno.hora.split(':');
+            let hora = parseInt(partesHora[0], 10);
+            let minutos = parseInt(partesHora[1], 10);
+
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            const esHoy = fechaTurnoDate.getTime() === hoy.getTime();
+
+            if (turno.asistencia == 1) {
+                estadoCell.textContent = "Asistió";
+            } 
+            else if (fechaTurnoDate < hoy) {
+                estadoCell.textContent = "Vencido";
+            } 
+            else if (esHoy) {
+                const ahora = new Date();
+                if (turno.estado == 1 && (hora < ahora.getHours() || (hora === ahora.getHours() && minutos < ahora.getMinutes()))) {
                     estadoCell.textContent = "Vencido";
                 }
-                else{
+                else {
                     estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
                 }
+            } 
+            else {
+                estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
+            }
+
                 row.appendChild(estadoCell);
 
                 const accionesCell = document.createElement('td');
@@ -47,9 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 tbody.appendChild(row);
 
-                if (new Date(turno.fecha) < new Date()) {
-                    document.getElementById('boton-vencidos').removeAttribute('disabled');
-                }
+                // if (new Date(turno.fecha) < new Date()) {
+                //     document.getElementById('boton-vencidos').removeAttribute('disabled');
+                // }
                 
             });
         })
@@ -62,20 +87,20 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.hide();
         });
 
-        document.getElementById('confirmCancelAll').addEventListener('click', function() {
-            cancelarTurnosVencidos();
-            var myModalEl = document.getElementById('cancelAllModal');
-            var modal = bootstrap.Modal.getInstance(myModalEl)
-            modal.hide();
-        });
+        // document.getElementById('confirmCancelAll').addEventListener('click', function() {
+        //     cancelarTurnosVencidos();
+        //     var myModalEl = document.getElementById('cancelAllModal');
+        //     var modal = bootstrap.Modal.getInstance(myModalEl)
+        //     modal.hide();
+        // });
 });
 
-function abrirModalCancelarTodos() {
-    var myModal = new bootstrap.Modal(document.getElementById('cancelAllModal'), {
-        keyboard: false
-    })
-    myModal.show();
-}
+// function abrirModalCancelarTodos() {
+//     var myModal = new bootstrap.Modal(document.getElementById('cancelAllModal'), {
+//         keyboard: false
+//     })
+//     myModal.show();
+// }
 
 function cancelarTurno(id, row) {
     fetch(`/cancelar_turno`, {
@@ -97,21 +122,21 @@ function cancelarTurno(id, row) {
     .catch(error => console.error('Error en la solicitud de cancelación:', error));
 }
 
-function cancelarTurnosVencidos(){
-    fetch(`/cancelar_turnos_vencidos`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message === 'Turnos vencidos cancelados correctamente') {
-            console.log('Turnos cancelados correctamente');
-            window.location.reload();
-        } else {
-            console.error('Error cancelando los turnos:', data.message);
-        }
-    })
-    .catch(error => console.error('Error en la solicitud de cancelación:', error));
-}
+// function cancelarTurnosVencidos(){
+//     fetch(`/cancelar_turnos_vencidos`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.message === 'Turnos vencidos cancelados correctamente') {
+//             console.log('Turnos cancelados correctamente');
+//             window.location.reload();
+//         } else {
+//             console.error('Error cancelando los turnos:', data.message);
+//         }
+//     })
+//     .catch(error => console.error('Error en la solicitud de cancelación:', error));
+// }
