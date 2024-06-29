@@ -130,13 +130,11 @@
         </div>
         <form id="appointmentForm">
             <label for="appointmentDate">Fecha del Turno:</label>
-            <input readonly type="text" id="appointmentDate" name="appointmentDate" required>
+            <input readonly type="text" id="appointmentDate" name="appointmentDate" required> 
             <label for="appointmentTime">Hora del Turno:</label>
             <select id="appointmentTime">
                 <!-- Las opciones llegan por JS -->
             </select>
-            
-
             <label for="dni">DNI del Paciente:</label>
             <input type="number" id="dni" name="dni" maxlength="8" required style="margin-bottom: 10px;">
             <div id="dniError" style="display: none; color: red; margin-bottom: 10px;">DNI no encontrado!</div>

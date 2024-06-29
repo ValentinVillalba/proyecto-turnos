@@ -216,10 +216,10 @@ def altaturno():
     return render_template('altaturno.html')
 
 @app.route('/mis_turnos')
-@login_required
-@role_required('cliente')
 def mis_turnos():
-    return render_template('mis_turnos.html')
+    # Suponiendo que tienes la lógica para obtener el rol del usuario en la sesión
+    user_role = session.get('role')  # O cualquier otra lógica que uses para obtener el rol
+    return render_template('mis_turnos.html', user_role=user_role)
 
 @app.route('/asistencia')
 @login_required
@@ -485,3 +485,29 @@ def update_asistencia():
             return jsonify({'error': 'Error al actualizar la asistencia'}), 500
     else:
         return jsonify({'error': 'Error al conectar a la base de datos'}), 500
+    
+@app.route('/get_turnos_dia_cliente')
+@login_required
+def get_turnos_dia_cliente():
+    fecha_actual = date.today()
+    connection = create_connection()
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        try:
+            query = """
+                SELECT turnos.fecha, turnos.hora, pacientes.dni, pacientes.nombre, pacientes.obra_soc, turnos.estado
+                FROM turnos
+                JOIN pacientes ON turnos.id_paciente = pacientes.id_paciente
+                WHERE turnos.fecha = %s
+                ORDER BY turnos.hora ASC
+            """
+            cursor.execute(query, (fecha_actual,))
+            rows = cursor.fetchall()
+            close_connection(connection)
+            rows = serialize_data(rows)
+            return jsonify(rows)
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({'message': 'Error al obtener los turnos del día'}), 500
+    else:
+        return jsonify({'message': 'Error al conectar a la base de datos'}), 500

@@ -1,14 +1,9 @@
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/get_turnos_usuario')
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/get_turnos_dia_cliente')
         .then(response => response.json())
         .then(data => {
             const tbody = document.querySelector('#tabla-turnos');
-            if (data[0] == undefined) {
-                console.log("No hay turnos");
-            }
-            else{
-                document.getElementById('obra-social-slot').innerHTML = data[0].obra_soc;
-            }
+            tbody.innerHTML = ''; // Limpiar la tabla antes de llenarla con nuevos datos
             data.forEach(turno => {
                 const row = document.createElement('tr');
 
@@ -17,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let day = fechaUTC.getUTCDate();
                 let month = fechaUTC.getUTCMonth() + 1;
                 let year = fechaUTC.getUTCFullYear();
-                
+
                 fechaCell.textContent = `${day}/${month}/${year}`;
                 row.appendChild(fechaCell);
 
@@ -25,18 +20,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 horaCell.textContent = turno.hora;
                 row.appendChild(horaCell);
 
+                const pacienteCell = document.createElement('td');
+                pacienteCell.textContent = turno.dni;
+                row.appendChild(pacienteCell);
+
+                const nombreCell = document.createElement('td');
+                nombreCell.textContent = turno.nombre;
+                nombreCell.classList.add('nowrap');
+                row.appendChild(nombreCell);
+
+                const obrasocialCell = document.createElement('td');
+                    obrasocialCell.textContent = turno.obra_soc;
+                    obrasocialCell.classList.add('nowrap');
+                    row.appendChild(obrasocialCell);
+
                 const estadoCell = document.createElement('td');
-                if (new Date(turno.fecha) < new Date()) {
+                if(turno.estado == 1 && new Date(turno.fecha) < new Date()){
                     estadoCell.textContent = "Vencido";
                 }
                 else{
-                    estadoCell.textContent = "Pendiente"
+                    estadoCell.textContent = turno.estado == 1 ? "Pendiente" : "Cancelado";
                 }
                 row.appendChild(estadoCell);
-
-                const dniCell = document.createElement('td');
-                dniCell.textContent = turno.dni;
-                row.appendChild(dniCell);
 
                 tbody.appendChild(row);
             });
